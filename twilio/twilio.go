@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Config holds the configuration options for the Twilio client.
 type Config struct {
 	AccountSID string `json:"account_sid"`
 	AuthToken  string `json:"auth_token"`
@@ -16,20 +17,26 @@ type Config struct {
 	LogNumber  string `json:"log_number"`
 }
 
+// Client is used to send sms messages via the Twilio REST api.
 type Client struct {
 	cfg    Config
 	client *http.Client
 	smsURL string
 }
 
+// NewClient returns an instantiated client.
 func NewClient(cfg Config, client *http.Client, smsURL string) *Client {
 	return &Client{
 		cfg:    cfg,
 		client: client,
-		smsURL: smsURL,
+		smsURL: "https://api.twilio.com/2010-04-01/Accounts/" + cfg.AccountSID + "/Messages.json",
 	}
 }
 
+// Send will send the message to the ToNumber in the Config.
+// If logging is true and there is an error sending the message,
+// an attempt to send the error to the LogNumber in the Config
+// will be made.
 func (c *Client) Send(msg string, logging bool) error {
 	err := c.send(msg, c.cfg.ToNumber)
 	if !logging || err == nil {
@@ -44,6 +51,7 @@ func (c *Client) Send(msg string, logging bool) error {
 	return err
 }
 
+// Log will send the message to the LogNumber in the Config.
 func (c *Client) Log(msg string) error {
 	return c.send(msg, c.cfg.LogNumber)
 }

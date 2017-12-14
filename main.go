@@ -32,8 +32,7 @@ func main() {
 	}
 
 	client := &http.Client{Timeout: time.Second * 60}
-	smsURL := "https://api.twilio.com/2010-04-01/Accounts/" + cfg.AccountSID + "/Messages.json"
-	tc := twilio.NewClient(cfg, client, smsURL)
+	tc := twilio.NewClient(cfg, client)
 
 	quote, err := getQuote()
 	if err != nil {
