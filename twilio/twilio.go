@@ -1,11 +1,15 @@
 package twilio
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Config holds the configuration options for the Twilio client.
@@ -24,22 +28,37 @@ type Client struct {
 	smsURL string
 }
 
-// NewClient returns an instantiated client.
-func NewClient(cfg Config, client *http.Client, smsURL string) *Client {
-	return &Client{
+// NewClient attempts to return an instantiated client. It can fail trying to open
+// or decode the config file.
+func NewClient(client *http.Client, configLocation string) (*Client, error) {
+	cfgFile, err := os.Open(configLocation)
+	if err != nil {
+		return nil, errors.Wrap(err, "error opening twilioi config file")
+	}
+	defer cfgFile.Close()
+
+	cfg := Config{}
+	err = json.NewDecoder(cfgFile).Decode(&cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error decoding twilio config json")
+	}
+
+	tc := &Client{
 		cfg:    cfg,
 		client: client,
 		smsURL: "https://api.twilio.com/2010-04-01/Accounts/" + cfg.AccountSID + "/Messages.json",
 	}
+
+	return tc, nil
 }
 
 // Send will send the message to the ToNumber in the Config.
 // If logging is true and there is an error sending the message,
 // an attempt to send the error to the LogNumber in the Config
 // will be made.
-func (c *Client) Send(msg string, logging bool) error {
+func (c *Client) Send(msg string, logError bool) error {
 	err := c.send(msg, c.cfg.ToNumber)
-	if !logging || err == nil {
+	if !logError || err == nil {
 		return err
 	}
 
