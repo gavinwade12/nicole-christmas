@@ -25,11 +25,12 @@ func main() {
 		"and I'll send you the hint for your next present. Good luck!"
 
 	keywords := map[string]string{
-		"sweets":         "I smell great, but I'm nothing like momma's cookin'.",
-		"merlot":         "There are only a few people that live here, but we have so much stuff!",
-		"gingerbread":    "If you wear me, where would you be?",
-		"pink":           "It's might cold traveling in part of my elephant. No need to worry; I can keep you warm.",
-		"warm christmas": "I hope you had fun! There's one last present, and this is the longest-lasting one. Enjoy!",
+		"sweets":      "I smell great, but I'm nothing like momma's cookin'.",
+		"merlot":      "There are only a few people that live here, but we have so much stuff!",
+		"gingerbread": "If you wear me, where would you be?",
+		"pink":        "It's might cold traveling in part of my elephant. No need to worry; I can keep you warm.",
+		"warm christmas": "I hope you had fun! There's one last present, and this is the longest-lasting one." +
+			"Expect a love quote every day from now until the end of time. Enjoy and I love you!",
 	}
 
 	srv = &http.Server{Addr: ":8080"}
