@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strings"
@@ -28,7 +29,7 @@ func main() {
 		"merlot":      "There are only a few people that live here, but we have so much stuff!",
 		"gingerbread": "If you wear me, where would you be?",
 		"pink":        "It's might cold traveling in part of my elephant. No need to worry; I can keep you warm.",
-		"warm christmas": "I hope you had fun! There's one last present, and this is the longest-lasting one." +
+		"warm christmas": "I hope you had fun! There's one last present, and this is the longest-lasting one. " +
 			"Expect a love quote every day from now until the end of time. Enjoy and I love you!",
 	}
 
@@ -85,7 +86,7 @@ func main() {
 }
 
 func shutdown(err error) {
-	sherr := srv.Shutdown(nil)
+	sherr := srv.Shutdown(context.Background())
 	if sherr != nil {
 		if err != nil {
 			log.Fatalf("failed shutting down: %v --- reason for shutdown: %v", sherr, err)

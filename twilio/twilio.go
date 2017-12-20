@@ -33,7 +33,7 @@ type Client struct {
 func NewClient(client *http.Client, configLocation string) (*Client, error) {
 	cfgFile, err := os.Open(configLocation)
 	if err != nil {
-		return nil, errors.Wrap(err, "error opening twilioi config file")
+		return nil, errors.Wrap(err, "error opening twilio config file")
 	}
 	defer cfgFile.Close()
 
