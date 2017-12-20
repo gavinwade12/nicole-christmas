@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -38,11 +37,10 @@ func main() {
 	http.HandleFunc("/christmas", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
-		defer r.Body.Close()
-		data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
+		if err := r.ParseForm(); err != nil {
 			shutdown(err)
 		}
+		data := r.FormValue("Body")
 
 		keyword := strings.ToLower(string(data))
 		if keyword == "start" {
