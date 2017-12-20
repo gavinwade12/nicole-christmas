@@ -44,6 +44,7 @@ func main() {
 		data := r.FormValue("Body")
 
 		keyword := strings.ToLower(string(data))
+		keyword = strings.TrimSpace(keyword)
 		if keyword == "start" {
 			err := tc.Send(greeting, true)
 			if err != nil {
