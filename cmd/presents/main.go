@@ -67,11 +67,11 @@ func main() {
 		}
 
 		if keyword == "warm christmas" {
-			shutdown(nil)
 			err := nc.SendQuote(tc)
 			if err != nil {
 				shutdown(err)
 			}
+			shutdown(nil)
 		}
 	})
 
