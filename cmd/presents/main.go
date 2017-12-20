@@ -32,13 +32,6 @@ func main() {
 
 	srv := &http.Server{Addr: ":8080"}
 
-	http.HandleFunc("/start", func(w http.ResponseWriter, r *http.Request) {
-		err := tc.Send(greeting, true)
-		if err != nil {
-			log.Fatal(err)
-		}
-	})
-
 	http.HandleFunc("/christmas", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 
@@ -50,6 +43,14 @@ func main() {
 		}
 
 		keyword := strings.ToLower(string(data))
+		if keyword == "start" {
+			err := tc.Send(greeting, true)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
 		hint := keywords[keyword]
 		if hint == "" {
 			err := tc.Send("Sorry, I don't know that keyword! Try again. :-)", true)
