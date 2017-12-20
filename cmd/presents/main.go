@@ -11,6 +11,8 @@ import (
 	"github.com/gavinwade12/nicole-christmas/twilio"
 )
 
+var srv *http.Server
+
 func main() {
 	client := &http.Client{Timeout: time.Second * 60}
 	tc, err := twilio.NewClient(client, "../../"+nc.TwilioConfigLocation)
@@ -30,7 +32,7 @@ func main() {
 		"warm christmas": "I hope you had fun! There's one last present, and this is the longest-lasting one. Enjoy!",
 	}
 
-	srv := &http.Server{Addr: ":8080"}
+	srv = &http.Server{Addr: ":8080"}
 
 	http.HandleFunc("/christmas", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -38,15 +40,14 @@ func main() {
 		defer r.Body.Close()
 		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			tc.Log(err.Error())
-			return
+			shutdown(err)
 		}
 
 		keyword := strings.ToLower(string(data))
 		if keyword == "start" {
 			err := tc.Send(greeting, true)
 			if err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 			return
 		}
@@ -55,21 +56,21 @@ func main() {
 		if hint == "" {
 			err := tc.Send("Sorry, I don't know that keyword! Try again. :-)", true)
 			if err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 			return
 		}
 
 		err = tc.Send(hint, true)
 		if err != nil {
-			log.Fatal(err)
+			shutdown(err)
 		}
 
 		if keyword == "warm christmas" {
-			srv.Shutdown(nil)
+			shutdown(nil)
 			err := nc.SendQuote(tc)
 			if err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 		}
 	})
@@ -79,6 +80,19 @@ func main() {
 	})
 
 	err = srv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func shutdown(err error) {
+	sherr := srv.Shutdown(nil)
+	if sherr != nil {
+		if err != nil {
+			log.Fatalf("failed shutting down: %v --- reason for shutdown: %v", sherr, err)
+		}
+		log.Fatal(sherr)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
